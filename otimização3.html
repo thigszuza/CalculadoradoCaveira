@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Skull - Alta Performance, Voz & Switch</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', Courier, monospace;
+            user-select: none;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #090706;
+            overflow-x: hidden;
+            position: relative;
+            padding: 20px;
+            color: #d1cfc7;
+        }
+
+        .app-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            align-items: stretch;
+            max-width: 1400px;
+            width: 100%;
+        }
+
+        /* --- Calculadora --- */
+        .calculator-container {
+            width: 360px;
+            background: #110e0c;
+            border-radius: 30px 30px 20px 20px;
+            padding: 16px 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+            border: 2px solid #2e2018;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            contain: layout style;
+        }
+
+        .skull-top {
+            width: 80px;
+            height: 70px;
+            margin-bottom: 2px;
+            will-change: transform;
+            animation: skullPulse 4s infinite ease-in-out;
+        }
+
+        @keyframes skullPulse {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-2px); }
+        }
+
+        .bone-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 95%;
+            margin: 6px 0;
+        }
+
+        .bone-joint {
+            width: 8px;
+            height: 8px;
+            background: #b8aa90;
+            border-radius: 50%;
+        }
+
+        .bone-bar {
+            flex-grow: 1;
+            height: 3px;
+            background: linear-gradient(90deg, #8a7b64, #d1c5b0, #8a7b64);
+            margin: 0 -3px;
+        }
+
+        /* --- Barra de Moedas com Botão Switch --- */
+        .currency-bar {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr auto;
+            gap: 5px;
+            align-items: center;
+            background: #080605;
+            border: 1px solid #2e2018;
+            border-radius: 8px;
+            padding: 5px 6px;
+            margin-bottom: 6px;
+        }
+
+        .currency-select {
+            background: #18120e;
+            color: #e59a60;
+            border: 1px solid #3d2b20;
+            border-radius: 5px;
+            padding: 3px;
+            font-size: 11px;
+            font-weight: bold;
+            outline: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-switch-currency {
+            background: #1b1411;
+            color: #e59a60;
+            border: 1px solid #3d2b20;
+            border-radius: 5px;
+            padding: 2px 6px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+            height: 24px;
+        }
+
+        .btn-switch-currency:hover {
+            background: #2e1c14;
+            color: #fff;
+            border-color: #b33600;
+        }
+
+        .btn-switch-currency:active {
+            transform: scale(0.9);
+            background: #b33600;
+        }
+
+        .btn-convert-action {
+            background: #38130a;
+            color: #ff9e79;
+            border: 1px solid #732a18;
+            border-radius: 5px;
+            padding: 3px 6px;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-convert-action:active {
+            background: #541c0f;
+        }
+
+        /* --- Visor Digital --- */
+        .display-box {
+            width: 100%;
+            background: #050403;
+            border: 1px solid #2b1d16;
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin-bottom: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .currency-indicator {
+            font-size: 10px;
+            color: #d36a32;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+
+        #display {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #ff6622;
+            font-size: 26px;
+            font-weight: bold;
+            text-align: right;
+            outline: none;
+            letter-spacing: 1px;
+        }
+
+        /* --- Barra de Controle de Voz --- */
+        .voice-bar {
+            width: 100%;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .btn-voice {
+            flex: 1;
+            height: 32px;
+            background: #1b1411;
+            border: 1px solid #4a2818;
+            color: #e59a60;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-voice:hover {
+            background: #2e1c14;
+            color: #fff;
+        }
+
+        .btn-voice.listening {
+            background: #b33600;
+            color: #fff;
+            border-color: #ff5500;
+            animation: pulseVoice 1.2s infinite alternate;
+        }
+
+        @keyframes pulseVoice {
+            0% { box-shadow: 0 0 5px rgba(255, 85, 0, 0.4); }
+            100% { box-shadow: 0 0 15px rgba(255, 85, 0, 0.9); }
+        }
+
+        .voice-status {
+            font-size: 10px;
+            color: #888;
+            max-width: 140px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* --- Teclado --- */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 7px;
+            width: 100%;
+            padding: 6px 0;
+        }
+
+        button {
+            height: 42px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
+        }
+
+        button:active, button.key-pressed {
+            filter: brightness(1.3);
+            transform: translateY(1px);
+        }
+
+        .btn-num {
+            background: #1c1815;
+            color: #d1cfc7;
+            border: 1px solid #2d2621;
+        }
+
+        .btn-op {
+            background: #2b110b;
+            color: #ffaa88;
+            border: 1px solid #4a1d12;
+        }
+
+        .btn-clear {
+            background: #24201e;
+            color: #ff6666;
+            border: 1px solid #3d3532;
+        }
+
+        .btn-eq {
+            grid-column: span 2;
+            background: #b33600;
+            color: #fff;
+            border: 1px solid #d44000;
+        }
+
+        /* --- Dashboard Lateral --- */
+        .side-dashboard {
+            flex: 1;
+            min-width: 450px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chart-panel, .history-panel {
+            background: #110e0c;
+            border: 2px solid #2e2018;
+            border-radius: 16px;
+            padding: 12px 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+            contain: layout;
+        }
+
+        .chart-header, .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .chart-title, .history-header h2 {
+            color: #e5672d;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .period-toggle {
+            display: flex;
+            background: #080605;
+            border-radius: 4px;
+            border: 1px solid #2e2018;
+            overflow: hidden;
+        }
+
+        .btn-period {
+            background: transparent;
+            border: none;
+            color: #777;
+            font-size: 10px;
+            padding: 2px 6px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .btn-period.active {
+            background: #b33600;
+            color: #fff;
+        }
+
+        .market-metrics {
+            display: flex;
+            gap: 10px;
+            font-size: 11px;
+        }
+
+        .metric-val { font-weight: bold; }
+        .val-up { color: #00cc66; }
+        .val-down { color: #dd3333; }
+
+        .chart-wrapper {
+            width: 100%;
+            height: 100px;
+            background: #050403;
+            border: 1px solid #241a14;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        #volatilityCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .history-panel {
+            max-height: 380px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .btn-clear-history {
+            background: #24110c;
+            color: #ff9e79;
+            border: 1px solid #4a1d12;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .table-container {
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .table-container::-webkit-scrollbar { width: 5px; }
+        .table-container::-webkit-scrollbar-thumb { background: #332017; border-radius: 3px; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            text-align: left;
+        }
+
+        th {
+            background: #080605;
+            color: #b8aa90;
+            padding: 5px;
+            border: 1px solid #241a14;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        td {
+            padding: 4px 6px;
+            border: 1px solid #1c1410;
+            color: #bbb;
+            background: #0b0908;
+        }
+
+        .desc-input {
+            width: 100%;
+            background: transparent;
+            border: 1px dashed #3a2b20;
+            color: #ff9e66;
+            padding: 2px 4px;
+            font-size: 11px;
+            outline: none;
+        }
+        .desc-input:focus { border: 1px solid #b33600; background: #050403; }
+
+        .tag-calc { color: #888; white-space: nowrap; }
+        .tag-res { color: #00dd77; font-weight: bold; white-space: nowrap; }
+        .tag-curr { color: #ffaa00; font-weight: bold; }
+
+        /* --- Mentor Exu Caveira --- */
+        .exu-mentor-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .exu-mentor-overlay.active {
+            display: flex;
+        }
+
+        .exu-card {
+            background: #110d0a;
+            border: 2px solid #b32d00;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 480px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(179, 45, 0, 0.4);
+        }
+
+        .exu-avatar {
+            width: 130px;
+            height: 110px;
+            margin: 0 auto 8px auto;
+        }
+
+        .exu-title {
+            color: #ff5511;
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .exu-dialogue {
+            color: #e5ded5;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 18px;
+            border-left: 3px solid #b32d00;
+            border-right: 3px solid #b32d00;
+            padding: 10px 14px;
+            background: #080605;
+            font-style: italic;
+        }
+
+        .exu-btn-dismiss {
+            background: #b32d00;
+            color: #fff;
+            border: 1px solid #e63900;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-wrapper">
+        <div class="calculator-container">
+            <svg class="skull-top" viewBox="0 0 100 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 5 C25 5 15 25 15 45 C15 57 20 65 28 68 C28 75 32 82 36 82 C40 82 42 78 50 78 C58 78 60 82 64 82 C68 82 72 75 72 68 C80 65 85 57 85 45 C85 25 75 5 50 5 Z" fill="#b8aa90" stroke="#1c1410" stroke-width="2"/>
+                <ellipse cx="34" cy="45" rx="9" ry="12" fill="#080605"/>
+                <ellipse cx="66" cy="45" rx="9" ry="12" fill="#080605"/>
+                <circle cx="35" cy="46" r="3" fill="#e54411"/>
+                <circle cx="65" cy="46" r="3" fill="#e54411"/>
+                <path d="M50 53 L46 63 L54 63 Z" fill="#080605"/>
+                <line x1="38" y1="72" x2="38" y2="80" stroke="#080605" stroke-width="2"/>
+                <line x1="44" y1="72" x2="44" y2="78" stroke="#080605" stroke-width="2"/>
+                <line x1="50" y1="72" x2="50" y2="78" stroke="#080605" stroke-width="2"/>
+                <line x1="56" y1="72" x2="56" y2="78" stroke="#080605" stroke-width="2"/>
+                <line x1="62" y1="72" x2="62" y2="80" stroke="#080605" stroke-width="2"/>
+            </svg>
+
+            <div class="bone-divider">
+                <div class="bone-joint"></div>
+                <div class="bone-bar"></div>
+                <div class="bone-joint"></div>
+            </div>
+
+            <!-- Conversor com Botão Switch -->
+            <div class="currency-bar">
+                <select id="sourceCurrency" class="currency-select" onchange="changeCurrency()">
+                    <option value="BRL" selected>BRL (R$) - Brasil</option>
+                    <option value="USD">USD ($) - EUA</option>
+                    <option value="EUR">EUR (€) - Europa</option>
+                    <option value="GBP">GBP (£) - Reino Unido</option>
+                    <option value="JPY">JPY (¥) - Japão</option>
+                    <option value="CAD">CAD (C$) - Canadá</option>
+                    <option value="AUD">AUD (A$) - Austrália</option>
+                    <option value="CHF">CHF (Fr) - Suíça</option>
+                    <option value="CNY">CNY (¥) - China</option>
+                    <option value="ARS">ARS ($) - Argentina</option>
+                    <option value="INR">INR (₹) - Índia</option>
+                    <option value="MXN">MXN ($) - México</option>
+                    <option value="RUB">RUB (₽) - Rússia</option>
+                    <option value="ZAR">ZAR (R) - África do Sul</option>
+                    <option value="TRY">TRY (₺) - Turquia</option>
+                    <option value="AED">AED (د.إ) - EAU</option>
+                    <option value="SAR">SAR (﷼) - Arábia S.</option>
+                    <option value="KRW">KRW (₩) - Coreia</option>
+                    <option value="SGD">SGD (S$) - Cingapura</option>
+                    <option value="HKD">HKD (HK$) - Hong Kong</option>
+                    <option value="NZD">NZD (NZ$) - N. Zelândia</option>
+                    <option value="SEK">SEK (kr) - Suécia</option>
+                    <option value="NOK">NOK (kr) - Noruega</option>
+                    <option value="DKK">DKK (kr.) - Dinamarca</option>
+                    <option value="PLN">PLN (zł) - Polônia</option>
+                    <option value="CLP">CLP ($) - Chile</option>
+                    <option value="COP">COP ($) - Colômbia</option>
+                    <option value="PEN">PEN (S/) - Peru</option>
+                    <option value="UYU">UYU ($U) - Uruguai</option>
+                    <option value="PYG">PYG (₲) - Paraguai</option>
+                    <option value="BOB">BOB (Bs.) - Bolívia</option>
+                    <option value="EGP">EGP (E£) - Egito</option>
+                    <option value="ILS">ILS (₪) - Israel</option>
+                    <option value="THB">THB (฿) - Tailândia</option>
+                    <option value="IDR">IDR (Rp) - Indonésia</option>
+                    <option value="MYR">MYR (RM) - Malásia</option>
+                    <option value="PHP">PHP (₱) - Filipinas</option>
+                    <option value="VND">VND (₫) - Vietnã</option>
+                    <option value="HUF">HUF (Ft) - Hungria</option>
+                    <option value="CZK">CZK (Kč) - R. Tcheca</option>
+                    <option value="BTC">BTC (₿) - Bitcoin</option>
+                    <option value="ETH">ETH (Ξ) - Ethereum</option>
+                    <option value="SOL">SOL (SOL) - Solana</option>
+                </select>
+
+                <button class="btn-switch-currency" onclick="switchCurrencies()" title="Inverter Moedas (Switch)">⇄</button>
+
+                <select id="targetCurrency" class="currency-select">
+                    <option value="USD" selected>USD ($) - EUA</option>
+                    <option value="BRL">BRL (R$) - Brasil</option>
+                    <option value="EUR">EUR (€) - Europa</option>
+                    <option value="GBP">GBP (£) - Reino Unido</option>
+                    <option value="JPY">JPY (¥) - Japão</option>
+                    <option value="CAD">CAD (C$) - Canadá</option>
+                    <option value="AUD">AUD (A$) - Austrália</option>
+                    <option value="CHF">CHF (Fr) - Suíça</option>
+                    <option value="CNY">CNY (¥) - China</option>
+                    <option value="ARS">ARS ($) - Argentina</option>
+                    <option value="INR">INR (₹) - Índia</option>
+                    <option value="MXN">MXN ($) - México</option>
+                    <option value="RUB">RUB (₽) - Rússia</option>
+                    <option value="ZAR">ZAR (R) - África do Sul</option>
+                    <option value="TRY">TRY (₺) - Turquia</option>
+                    <option value="AED">AED (د.إ) - EAU</option>
+                    <option value="SAR">SAR (﷼) - Arábia S.</option>
+                    <option value="KRW">KRW (₩) - Coreia</option>
+                    <option value="SGD">SGD (S$) - Cingapura</option>
+                    <option value="HKD">HKD (HK$) - Hong Kong</option>
+                    <option value="NZD">NZD (NZ$) - N. Zelândia</option>
+                    <option value="SEK">SEK (kr) - Suécia</option>
+                    <option value="NOK">NOK (kr) - Noruega</option>
+                    <option value="DKK">DKK (kr.) - Dinamarca</option>
+                    <option value="PLN">PLN (zł) - Polônia</option>
+                    <option value="CLP">CLP ($) - Chile</option>
+                    <option value="COP">COP ($) - Colômbia</option>
+                    <option value="PEN">PEN (S/) - Peru</option>
+                    <option value="UYU">UYU ($U) - Uruguai</option>
+                    <option value="PYG">PYG (₲) - Paraguai</option>
+                    <option value="BOB">BOB (Bs.) - Bolívia</option>
+                    <option value="EGP">EGP (E£) - Egito</option>
+                    <option value="ILS">ILS (₪) - Israel</option>
+                    <option value="THB">THB (฿) - Tailândia</option>
+                    <option value="IDR">IDR (Rp) - Indonésia</option>
+                    <option value="MYR">MYR (RM) - Malásia</option>
+                    <option value="PHP">PHP (₱) - Filipinas</option>
+                    <option value="VND">VND (₫) - Vietnã</option>
+                    <option value="HUF">HUF (Ft) - Hungria</option>
+                    <option value="CZK">CZK (Kč) - R. Tcheca</option>
+                    <option value="BTC">BTC (₿) - Bitcoin</option>
+                    <option value="ETH">ETH (Ξ) - Ethereum</option>
+                    <option value="SOL">SOL (SOL) - Solana</option>
+                </select>
+
+                <button class="btn-convert-action" onclick="convertCurrentValue()">CONV</button>
+            </div>
+
+            <div class="display-box">
+                <span id="currencyIndicator" class="currency-indicator">BRL (R$) • 2 Decimais</span>
+                <input type="text" id="display" readonly value="0">
+            </div>
+
+            <!-- Botão de Comando de Voz -->
+            <div class="voice-bar">
+                <button id="btnVoice" class="btn-voice" onclick="toggleVoiceRecognition()">
+                    <span>🎤</span> <span id="voiceBtnText">COMANDO DE VOZ</span>
+                </button>
+                <span id="voiceStatus" class="voice-status">Aguardando...</span>
+            </div>
+
+            <div class="bone-divider">
+                <div class="bone-joint"></div>
+                <div class="bone-bar"></div>
+                <div class="bone-joint"></div>
+            </div>
+
+            <div class="keypad">
+                <button id="key-c" class="btn-clear" onclick="clearDisplay()">C</button>
+                <button id="key-div" class="btn-op" onclick="setOP('/')">/</button>
+                <button id="key-mul" class="btn-op" onclick="setOP('*')">×</button>
+                <button id="key-sub" class="btn-op" onclick="setOP('-')">-</button>
+
+                <button id="key-7" class="btn-num" onclick="addDigit('7')">7</button>
+                <button id="key-8" class="btn-num" onclick="addDigit('8')">8</button>
+                <button id="key-9" class="btn-num" onclick="addDigit('9')">9</button>
+                <button id="key-add" class="btn-op" onclick="setOP('+')">+</button>
+
+                <button id="key-4" class="btn-num" onclick="addDigit('4')">4</button>
+                <button id="key-5" class="btn-num" onclick="addDigit('5')">5</button>
+                <button id="key-6" class="btn-num" onclick="addDigit('6')">6</button>
+                <button id="key-dot" class="btn-num" onclick="addDigit('.')">.</button>
+
+                <button id="key-1" class="btn-num" onclick="addDigit('1')">1</button>
+                <button id="key-2" class="btn-num" onclick="addDigit('2')">2</button>
+                <button id="key-3" class="btn-num" onclick="addDigit('3')">3</button>
+                <button id="key-0" class="btn-num" onclick="addDigit('0')">0</button>
+
+                <button id="key-del" class="btn-clear" onclick="deleteDigit()">DEL</button>
+                <button id="key-eq" class="btn-eq" onclick="calculate()">=</button>
+            </div>
+        </div>
+
+        <div class="side-dashboard">
+            <div class="chart-panel">
+                <div class="chart-header">
+                    <div class="chart-title-box">
+                        <span id="chartCurrencyTitle" class="chart-title">Volatilidade: BRL</span>
+                        <div class="period-toggle">
+                            <button id="btn24h" class="btn-period active" onclick="setPeriod('24h')">24H</button>
+                            <button id="btn7d" class="btn-period" onclick="setPeriod('7d')">7D</button>
+                        </div>
+                    </div>
+                    <div class="market-metrics">
+                        <span class="metric-item">Tendência: <span id="trendVal" class="metric-val val-up">+1.42% ▲</span></span>
+                        <span class="metric-item">Volatilidade: <span id="volVal" class="metric-val">Alta</span></span>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="volatilityCanvas"></canvas>
+                </div>
+            </div>
+
+            <div class="history-panel">
+                <div class="history-header">
+                    <h2>Planilha de Cálculos & Câmbio</h2>
+                    <button class="btn-clear-history" onclick="clearHistory()">Limpar Tabela</button>
+                </div>
+                <div class="table-container">
+                    <table id="historyTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%;">Data / Hora</th>
+                                <th style="width: 12%;">Moeda</th>
+                                <th style="width: 23%;">Operação / Câmbio</th>
+                                <th style="width: 20%;">Resultado</th>
+                                <th style="width: 25%;">Descrição</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Exu Caveira (Capa & Foice) -->
+    <div id="exuModal" class="exu-mentor-overlay">
+        <div class="exu-card">
+            <svg class="exu-avatar" viewBox="0 0 160 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M120 15 L85 130" stroke="#5c3a21" stroke-width="4.5" stroke-linecap="round"/>
+                <path d="M120 15 C135 10 155 25 150 45 C145 32 132 25 120 22 Z" fill="#999" stroke="#ddd" stroke-width="1.5"/>
+                <path d="M30 135 C30 80 42 50 65 35 C88 50 100 80 100 135 Z" fill="#0d0907" stroke="#2b1a12" stroke-width="2"/>
+                <path d="M42 135 C45 90 52 65 65 52 C78 65 85 90 88 135 Z" fill="#520e06"/>
+                <path d="M65 48 C53 48 46 58 46 70 C46 78 50 84 54 86 L54 94 C54 97 58 97 65 97 C72 97 76 97 76 94 L76 86 C80 84 84 78 84 70 C84 58 77 48 65 48 Z" fill="#d9ceb8"/>
+                <ellipse cx="57" cy="68" rx="4.5" ry="6.5" fill="#080504"/>
+                <ellipse cx="73" cy="68" rx="4.5" ry="6.5" fill="#080504"/>
+                <circle cx="57" cy="68" r="2.5" fill="#ff3300"/>
+                <circle cx="73" cy="68" r="2.5" fill="#ff3300"/>
+                <path d="M65 73 L62 80 L68 80 Z" fill="#080504"/>
+            </svg>
+            <div class="exu-title">Exu Caveira Adverte:</div>
+            <div id="exuMessage" class="exu-dialogue"></div>
+            <button class="exu-btn-dismiss" onclick="dismissMentor()">ENTENDIDO, MESTRE</button>
+        </div>
+    </div>
+
+    <script>
+        const CURRENCIES = {
+            BRL: { symbol: 'R$', decimals: 2, rateToUSD: 0.18, volFactor: 0.12, name: 'Brasil (Real)' },
+            USD: { symbol: '$', decimals: 2, rateToUSD: 1.0, volFactor: 0.04, name: 'EUA (Dólar)' },
+            EUR: { symbol: '€', decimals: 2, rateToUSD: 1.08, volFactor: 0.05, name: 'Euro' },
+            GBP: { symbol: '£', decimals: 2, rateToUSD: 1.28, volFactor: 0.06, name: 'Libra' },
+            JPY: { symbol: '¥', decimals: 0, rateToUSD: 0.0068, volFactor: 0.07, name: 'Iene' },
+            CAD: { symbol: 'C$', decimals: 2, rateToUSD: 0.74, volFactor: 0.06, name: 'Canadá' },
+            AUD: { symbol: 'A$', decimals: 2, rateToUSD: 0.65, volFactor: 0.08, name: 'Austrália' },
+            CHF: { symbol: 'Fr', decimals: 2, rateToUSD: 1.13, volFactor: 0.03, name: 'Suíça' },
+            CNY: { symbol: '¥', decimals: 2, rateToUSD: 0.14, volFactor: 0.04, name: 'China' },
+            ARS: { symbol: '$', decimals: 2, rateToUSD: 0.0011, volFactor: 0.35, name: 'Argentina' },
+            INR: { symbol: '₹', decimals: 2, rateToUSD: 0.012, volFactor: 0.06, name: 'Índia' },
+            MXN: { symbol: '$', decimals: 2, rateToUSD: 0.053, volFactor: 0.09, name: 'México' },
+            RUB: { symbol: '₽', decimals: 2, rateToUSD: 0.011, volFactor: 0.16, name: 'Rússia' },
+            ZAR: { symbol: 'R', decimals: 2, rateToUSD: 0.055, volFactor: 0.14, name: 'África do Sul' },
+            TRY: { symbol: '₺', decimals: 2, rateToUSD: 0.030, volFactor: 0.28, name: 'Turquia' },
+            AED: { symbol: 'د.إ', decimals: 2, rateToUSD: 0.27, volFactor: 0.02, name: 'EAU' },
+            SAR: { symbol: '﷼', decimals: 2, rateToUSD: 0.27, volFactor: 0.02, name: 'Arábia S.' },
+            KRW: { symbol: '₩', decimals: 0, rateToUSD: 0.00075, volFactor: 0.08, name: 'Coreia' },
+            SGD: { symbol: 'S$', decimals: 2, rateToUSD: 0.76, volFactor: 0.04, name: 'Cingapura' },
+            HKD: { symbol: 'HK$', decimals: 2, rateToUSD: 0.13, volFactor: 0.02, name: 'Hong Kong' },
+            NZD: { symbol: 'NZ$', decimals: 2, rateToUSD: 0.61, volFactor: 0.07, name: 'N. Zelândia' },
+            SEK: { symbol: 'kr', decimals: 2, rateToUSD: 0.096, volFactor: 0.06, name: 'Suécia' },
+            NOK: { symbol: 'kr', decimals: 2, rateToUSD: 0.094, volFactor: 0.06, name: 'Noruega' },
+            DKK: { symbol: 'kr.', decimals: 2, rateToUSD: 0.145, volFactor: 0.05, name: 'Dinamarca' },
+            PLN: { symbol: 'zł', decimals: 2, rateToUSD: 0.25, volFactor: 0.07, name: 'Polônia' },
+            CLP: { symbol: '$', decimals: 0, rateToUSD: 0.0011, volFactor: 0.11, name: 'Chile' },
+            COP: { symbol: '$', decimals: 2, rateToUSD: 0.00025, volFactor: 0.12, name: 'Colômbia' },
+            PEN: { symbol: 'S/', decimals: 2, rateToUSD: 0.27, volFactor: 0.05, name: 'Peru' },
+            UYU: { symbol: '$U', decimals: 2, rateToUSD: 0.025, volFactor: 0.08, name: 'Uruguai' },
+            PYG: { symbol: '₲', decimals: 0, rateToUSD: 0.00013, volFactor: 0.09, name: 'Paraguai' },
+            BOB: { symbol: 'Bs.', decimals: 2, rateToUSD: 0.14, volFactor: 0.06, name: 'Bolívia' },
+            EGP: { symbol: 'E£', decimals: 2, rateToUSD: 0.021, volFactor: 0.20, name: 'Egito' },
+            ILS: { symbol: '₪', decimals: 2, rateToUSD: 0.27, volFactor: 0.08, name: 'Israel' },
+            THB: { symbol: '฿', decimals: 2, rateToUSD: 0.028, volFactor: 0.07, name: 'Tailândia' },
+            IDR: { symbol: 'Rp', decimals: 2, rateToUSD: 0.000063, volFactor: 0.08, name: 'Indonésia' },
+            MYR: { symbol: 'RM', decimals: 2, rateToUSD: 0.22, volFactor: 0.06, name: 'Malásia' },
+            PHP: { symbol: '₱', decimals: 2, rateToUSD: 0.017, volFactor: 0.07, name: 'Filipinas' },
+            VND: { symbol: '₫', decimals: 0, rateToUSD: 0.000040, volFactor: 0.05, name: 'Vietnã' },
+            HUF: { symbol: 'Ft', decimals: 2, rateToUSD: 0.0027, volFactor: 0.09, name: 'Hungria' },
+            CZK: { symbol: 'Kč', decimals: 2, rateToUSD: 0.043, volFactor: 0.06, name: 'R. Tcheca' },
+            BTC: { symbol: '₿', decimals: 8, rateToUSD: 64000.0, volFactor: 0.45, name: 'Bitcoin' },
+            ETH: { symbol: 'Ξ', decimals: 6, rateToUSD: 3400.0, volFactor: 0.52, name: 'Ethereum' },
+            SOL: { symbol: 'SOL', decimals: 4, rateToUSD: 145.0, volFactor: 0.60, name: 'Solana' }
+        };
+
+        const chartCanvas = document.getElementById('volatilityCanvas');
+        const chartCtx = chartCanvas.getContext('2d', { alpha: false });
+        let chartDataPoints = [];
+        let currentPeriod = '24h';
+
+        function setPeriod(p) {
+            currentPeriod = p;
+            document.getElementById('btn24h').className = p === '24h' ? 'btn-period active' : 'btn-period';
+            document.getElementById('btn7d').className = p === '7d' ? 'btn-period active' : 'btn-period';
+            initVolatilityData(selectedCurrency);
+        }
+
+        function initVolatilityData(currCode) {
+            const meta = CURRENCIES[currCode] || CURRENCIES.BRL;
+            const basePrice = meta.rateToUSD;
+            chartDataPoints = [];
+            const pointsCount = currentPeriod === '24h' ? 24 : 48;
+            const volMult = currentPeriod === '24h' ? 0.06 : 0.18;
+            let currentVal = basePrice;
+
+            for (let i = 0; i < pointsCount; i++) {
+                currentVal += (Math.random() - 0.48) * (meta.volFactor * currentVal * volMult);
+                if (currentVal <= 0) currentVal = basePrice * 0.5;
+                chartDataPoints.push(currentVal);
+            }
+
+            const titleEl = document.getElementById('chartCurrencyTitle');
+            const trendEl = document.getElementById('trendVal');
+            const volEl = document.getElementById('volVal');
+
+            titleEl.textContent = `Volatilidade: ${meta.name}`;
+            const diffPct = ((chartDataPoints[chartDataPoints.length - 1] - chartDataPoints[0]) / chartDataPoints[0]) * 100;
+            trendEl.textContent = `${diffPct >= 0 ? '+' : ''}${diffPct.toFixed(2)}% ${diffPct >= 0 ? '▲' : '▼'}`;
+            trendEl.className = diffPct >= 0 ? 'metric-val val-up' : 'metric-val val-down';
+
+            const volPct = (meta.volFactor * 100).toFixed(0);
+            volEl.textContent = `${meta.volFactor > 0.25 ? 'Alta' : (meta.volFactor > 0.08 ? 'Média' : 'Baixa')} (${volPct}%)`;
+
+            drawChart();
+        }
+
+        function drawChart() {
+            const w = chartCanvas.width = chartCanvas.parentElement.clientWidth;
+            const h = chartCanvas.height = chartCanvas.parentElement.clientHeight;
+
+            chartCtx.fillStyle = '#050403';
+            chartCtx.fillRect(0, 0, w, h);
+
+            chartCtx.strokeStyle = '#1a130f';
+            chartCtx.lineWidth = 1;
+            for (let y = 20; y < h; y += 25) {
+                chartCtx.beginPath();
+                chartCtx.moveTo(0, y);
+                chartCtx.lineTo(w, y);
+                chartCtx.stroke();
+            }
+
+            const min = Math.min(...chartDataPoints);
+            const max = Math.max(...chartDataPoints);
+            const range = (max - min) || 1;
+            const stepX = w / (chartDataPoints.length - 1);
+
+            chartCtx.beginPath();
+            for (let i = 0; i < chartDataPoints.length; i++) {
+                const x = i * stepX;
+                const y = h - 10 - ((chartDataPoints[i] - min) / range) * (h - 20);
+                if (i === 0) chartCtx.moveTo(x, y);
+                else chartCtx.lineTo(x, y);
+            }
+            chartCtx.strokeStyle = '#d35400';
+            chartCtx.lineWidth = 2;
+            chartCtx.stroke();
+        }
+
+        const exuQuotes = [
+            "\"Laroyê! Quer dividir por zero e desafiar o impossível? Corrija essa conta agora.\"",
+            "\"Quem erra na encruzilhada dos números perde o rumo. Preste atenção no cálculo!\"",
+            "\"Moeda sem lastro ou conta furada não passa pela minha foice. Refaça com clareza.\"",
+            "\"A foice corta a ilusão: zere esse visor e faça o cálculo direito!\""
+        ];
+
+        function triggerMentor(customMsg) {
+            document.getElementById('exuMessage').textContent = customMsg || exuQuotes[Math.floor(Math.random() * exuQuotes.length)];
+            document.getElementById('exuModal').classList.add('active');
+        }
+
+        function dismissMentor() {
+            document.getElementById('exuModal').classList.remove('active');
+        }
+
+        let currentInput = '0';
+        let previousInput = '';
+        let operator = null;
+        let shouldResetDisplay = false;
+        let selectedCurrency = 'BRL';
+        let calculationCount = 0;
+        let historyLogs = JSON.parse(localStorage.getItem('calc_history_logs')) || [];
+
+        const displayEl = document.getElementById('display');
+        const currencyIndicatorEl = document.getElementById('currencyIndicator');
+        const sourceCurrencyEl = document.getElementById('sourceCurrency');
+        const targetCurrencyEl = document.getElementById('targetCurrency');
+        const historyBody = document.getElementById('historyBody');
+
+        function formatValueWithCurrency(val, currCode) {
+            const num = parseFloat(val);
+            if (isNaN(num)) return val;
+            const meta = CURRENCIES[currCode] || { symbol: '', decimals: 2 };
+            return `${meta.symbol} ${num.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: meta.decimals })}`;
+        }
+
+        function updateDisplay() {
+            displayEl.value = currentInput;
+            const meta = CURRENCIES[selectedCurrency] || CURRENCIES.BRL;
+            currencyIndicatorEl.textContent = `${selectedCurrency} (${meta.symbol}) • ${meta.decimals} Decimais`;
+        }
+
+        function changeCurrency() {
+            selectedCurrency = sourceCurrencyEl.value;
+            updateDisplay();
+            initVolatilityData(selectedCurrency);
+        }
+
+        function switchCurrencies() {
+            const currentSource = sourceCurrencyEl.value;
+            const currentTarget = targetCurrencyEl.value;
+
+            sourceCurrencyEl.value = currentTarget;
+            targetCurrencyEl.value = currentSource;
+
+            changeCurrency();
+        }
+
+        function addDigit(digit) {
+            if (shouldResetDisplay) {
+                currentInput = digit;
+                shouldResetDisplay = false;
+            } else {
+                if (currentInput === '0' && digit !== '.') {
+                    currentInput = digit;
+                } else {
+                    if (digit === '.' && currentInput.includes('.')) return;
+                    currentInput += digit;
+                }
+            }
+            displayEl.value = currentInput;
+        }
+
+        function deleteDigit() {
+            if (shouldResetDisplay) return;
+            currentInput = (currentInput.length <= 1 || (currentInput.length === 2 && currentInput.startsWith('-'))) ? '0' : currentInput.slice(0, -1);
+            displayEl.value = currentInput;
+        }
+
+        function clearDisplay() {
+            currentInput = '0';
+            previousInput = '';
+            operator = null;
+            shouldResetDisplay = false;
+            displayEl.value = '0';
+        }
+
+        function setOP(op) {
+            if (operator !== null && !shouldResetDisplay) calculate();
+            previousInput = currentInput;
+            operator = op;
+            shouldResetDisplay = true;
+        }
+
+        function calculate() {
+            if (operator === null || shouldResetDisplay) {
+                triggerMentor("\"Não há operação pendente para calcular. O que você está tentando fazer?\"");
+                return;
+            }
+
+            const prev = parseFloat(previousInput);
+            const current = parseFloat(currentInput);
+
+            if (isNaN(prev) || isNaN(current)) {
+                triggerMentor("\"Números corrompidos! Limpe a mesa e comece de novo.\"");
+                currentInput = "ERRO";
+                updateDisplay();
+                return;
+            }
+
+            if (operator === '/' && current === 0) {
+                triggerMentor("\"Laroyê! Tentando dividir por zero? Nem a morte quebra as regras da matemática!\"");
+                currentInput = "MORTO";
+                updateDisplay();
+                return;
+            }
+
+            let result;
+            if (operator === '+') result = prev + current;
+            else if (operator === '-') result = prev - current;
+            else if (operator === '*') result = prev * current;
+            else if (operator === '/') result = prev / current;
+
+            const decimals = (CURRENCIES[selectedCurrency] || CURRENCIES.BRL).decimals;
+            const formattedResult = typeof result === 'number' ? String(parseFloat(result.toFixed(decimals))) : result;
+            const meta = CURRENCIES[selectedCurrency] || CURRENCIES.BRL;
+            const opText = `${meta.symbol} ${prev} ${operator} ${current}`;
+            const resDisplay = formatValueWithCurrency(formattedResult, selectedCurrency);
+            
+            addHistoryEntry(selectedCurrency, opText, resDisplay);
+
+            currentInput = formattedResult;
+            operator = null;
+            displayEl.value = currentInput;
+            shouldResetDisplay = true;
+            initVolatilityData(selectedCurrency);
+
+            calculationCount++;
+            if (calculationCount > 2) {
+                triggerMentor("\"Laroyê! Não se usa calculadora para os cálculos do dia a dia, hein? Preguiça não tem vez aqui. Use o cérebro para pensar, não essas Inteligências Artificiais!\"");
+                calculationCount = 0;
+            }
+        }
+
+        function convertCurrentValue(customTarget) {
+            const num = parseFloat(currentInput);
+            if (isNaN(num)) return;
+
+            const from = sourceCurrencyEl.value;
+            const to = customTarget || targetCurrencyEl.value;
+            if (from === to) return;
+
+            const converted = (num * CURRENCIES[from].rateToUSD) / CURRENCIES[to].rateToUSD;
+            const formattedResult = String(parseFloat(converted.toFixed(CURRENCIES[to].decimals)));
+
+            addHistoryEntry(`${from}➔${to}`, `Câmbio: ${formatValueWithCurrency(num, from)} ➔ ${to}`, formatValueWithCurrency(formattedResult, to));
+
+            selectedCurrency = to;
+            sourceCurrencyEl.value = to;
+            currentInput = formattedResult;
+            updateDisplay();
+            shouldResetDisplay = true;
+            initVolatilityData(to);
+
+            calculationCount++;
+            if (calculationCount > 2) {
+                triggerMentor("\"Laroyê! Não se usa calculadora para os cálculos do dia a dia, hein? Preguiça não tem vez aqui. Use o cérebro para pensar, não essas Inteligências Artificiais!\"");
+                calculationCount = 0;
+            }
+        }
+
+        /* --- Reconhecimento de Voz Aprimorado com Conversão Automática --- */
+        let recognition = null;
+        let isListening = false;
+        const btnVoice = document.getElementById('btnVoice');
+        const voiceBtnText = document.getElementById('voiceBtnText');
+        const voiceStatus = document.getElementById('voiceStatus');
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.lang = 'pt-BR';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onstart = () => {
+                isListening = true;
+                btnVoice.classList.add('listening');
+                voiceBtnText.textContent = 'OUVINDO...';
+                voiceStatus.textContent = 'Pode falar...';
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                btnVoice.classList.remove('listening');
+                voiceBtnText.textContent = 'COMANDO DE VOZ';
+                if (voiceStatus.textContent === 'Pode falar...') {
+                    voiceStatus.textContent = 'Aguardando...';
+                }
+            };
+
+            recognition.onerror = (event) => {
+                isListening = false;
+                btnVoice.classList.remove('listening');
+                voiceBtnText.textContent = 'COMANDO DE VOZ';
+
+                if (event.error === 'no-speech') {
+                    voiceStatus.textContent = 'Nenhuma voz ouvida';
+                } else if (event.error === 'not-allowed') {
+                    voiceStatus.textContent = 'Permissão negada';
+                    alert('Por favor, permita o acesso ao microfone no navegador.');
+                } else {
+                    voiceStatus.textContent = 'Aguardando...';
+                }
+            };
+
+            recognition.onresult = (event) => {
+                const text = event.results[0][0].transcript.toLowerCase().trim();
+                voiceStatus.textContent = `"${text}"`;
+                processVoiceCommand(text);
+            };
+        } else {
+            btnVoice.disabled = true;
+            voiceStatus.textContent = 'Voz não suportada';
+        }
+
+        function toggleVoiceRecognition() {
+            if (!recognition) return;
+            if (isListening) {
+                recognition.stop();
+            } else {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    recognition.stop();
+                }
+            }
+        }
+
+        function processVoiceCommand(cmd) {
+            // Ações utilitárias rápidas
+            if (cmd.includes('limpar') || cmd.includes('zerar') || cmd.includes('apagar tudo')) {
+                clearDisplay();
+                triggerButtonVisual('key-c');
+                return;
+            }
+            if (cmd.includes('inverter') || cmd.includes('trocar moeda') || cmd.includes('switch')) {
+                switchCurrencies();
+                return;
+            }
+            if (cmd.includes('apagar') || cmd.includes('deletar') || cmd.includes('corrige')) {
+                deleteDigit();
+                triggerButtonVisual('key-del');
+                return;
+            }
+
+            // Dicionário de Moedas e termos comuns em português
+            const currencyMap = {
+                'dólar': 'USD', 'dolar': 'USD', 'americana': 'USD', 'americano': 'USD', 'dolares': 'USD',
+                'real': 'BRL', 'reais': 'BRL', 'brasileira': 'BRL', 'brasileiro': 'BRL',
+                'euro': 'EUR', 'euros': 'EUR', 'europeia': 'EUR',
+                'libra': 'GBP', 'libras': 'GBP', 'britânica': 'GBP',
+                'iene': 'JPY', 'ienes': 'JPY', 'japonesa': 'JPY',
+                'peso': 'ARS', 'pesos': 'ARS', 'argentino': 'ARS',
+                'bitcoin': 'BTC', 'bitcoins': 'BTC',
+                'ethereum': 'ETH', 'solana': 'SOL',
+                'franco': 'CHF', 'yuan': 'CNY', 'rublo': 'RUB'
+            };
+
+            // Detecta moeda alvo falada (ex: "em dolar", "na moeda americana", "para euro")
+            let targetCurrencyFound = null;
+            for (let term in currencyMap) {
+                const regex = new RegExp(`\\b(em|para|na moeda|no|pra|como|moeda)\\s+(${term})\\b`, 'i');
+                if (regex.test(cmd) || cmd.includes(`moeda ${term}`) || cmd.includes(`em ${term}`)) {
+                    targetCurrencyFound = currencyMap[term];
+                    break;
+                }
+            }
+
+            // Normaliza termos falados para operadores e números
+            let parsed = cmd
+                .replace(/mais/g, '+')
+                .replace(/menos/g, '-')
+                .replace(/vezes/g, '*')
+                .replace(/multiplicado por/g, '*')
+                .replace(/multiplica por/g, '*')
+                .replace(/dividido por/g, '/')
+                .replace(/dividir por/g, '/')
+                .replace(/por/g, '/')
+                .replace(/vírgula/g, '.')
+                .replace(/ponto/g, '.')
+                .replace(/x/g, '*');
+
+            const numWords = {
+                'zero': '0', 'um': '1', 'dois': '2', 'três': '3', 'tres': '3', 'quatro': '4',
+                'cinco': '5', 'seis': '6', 'sete': '7', 'oito': '8', 'nove': '9', 'dez': '10',
+                'cem': '100', 'cento': '100', 'mil': '1000'
+            };
+
+            for (let word in numWords) {
+                const regex = new RegExp(`\\b${word}\\b`, 'g');
+                parsed = parsed.replace(regex, numWords[word]);
+            }
+
+            // Extrai a expressão matemática dos tokens falados
+            const mathTokens = parsed.match(/[\d\.]+|[\+\-\*\/]/g);
+
+            if (mathTokens && mathTokens.length > 0) {
+                let firstVal = null;
+                let mathOp = null;
+                let secondVal = null;
+
+                mathTokens.forEach(token => {
+                    if (['+', '-', '*', '/'].includes(token)) {
+                        mathOp = token;
+                    } else if (!isNaN(parseFloat(token))) {
+                        if (firstVal === null) firstVal = token;
+                        else if (mathOp !== null && secondVal === null) secondVal = token;
+                    }
+                });
+
+                if (firstVal !== null && mathOp !== null && secondVal !== null) {
+                    // Executa o cálculo diretamente
+                    const n1 = parseFloat(firstVal);
+                    const n2 = parseFloat(secondVal);
+                    let calcRes;
+                    if (mathOp === '+') calcRes = n1 + n2;
+                    else if (mathOp === '-') calcRes = n1 - n2;
+                    else if (mathOp === '*') calcRes = n1 * n2;
+                    else if (mathOp === '/') calcRes = n2 === 0 ? "MORTO" : n1 / n2;
+
+                    const decimals = (CURRENCIES[selectedCurrency] || CURRENCIES.BRL).decimals;
+                    const formattedResult = typeof calcRes === 'number' ? String(parseFloat(calcRes.toFixed(decimals))) : calcRes;
+                    
+                    const meta = CURRENCIES[selectedCurrency] || CURRENCIES.BRL;
+                    const opText = `${meta.symbol} ${n1} ${mathOp} ${n2}`;
+                    const resDisplay = formatValueWithCurrency(formattedResult, selectedCurrency);
+                    addHistoryEntry(selectedCurrency, opText, resDisplay);
+
+                    currentInput = formattedResult;
+                    operator = null;
+                    displayEl.value = currentInput;
+                    shouldResetDisplay = true;
+
+                    // Se foi pedida uma conversão na mesma frase, converte imediatamente
+                    if (targetCurrencyFound) {
+                        targetCurrencyEl.value = targetCurrencyFound;
+                        convertCurrentValue(targetCurrencyFound);
+                    }
+                    return;
+                } else if (firstVal !== null && targetCurrencyFound) {
+                    // Exemplo: "converter 50 para dolar"
+                    currentInput = firstVal;
+                    displayEl.value = currentInput;
+                    targetCurrencyEl.value = targetCurrencyFound;
+                    convertCurrentValue(targetCurrencyFound);
+                    return;
+                } else {
+                    // Adiciona os tokens no visor normalmente
+                    mathTokens.forEach(token => {
+                        if (['+', '-', '*', '/'].includes(token)) {
+                            setOP(token);
+                        } else if (!isNaN(parseFloat(token))) {
+                            if (shouldResetDisplay || currentInput === '0') {
+                                currentInput = token;
+                                shouldResetDisplay = false;
+                            } else {
+                                currentInput += token;
+                            }
+                            displayEl.value = currentInput;
+                        }
+                    });
+                }
+            } else if (targetCurrencyFound) {
+                // Apenas troca de moeda por voz
+                sourceCurrencyEl.value = targetCurrencyFound;
+                changeCurrency();
+            }
+
+            if (cmd.includes('igual') || cmd.includes('calcular') || cmd.includes('resultado')) {
+                calculate();
+                triggerButtonVisual('key-eq');
+            }
+        }
+
+        function triggerButtonVisual(btnId) {
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                btn.classList.add('key-pressed');
+                setTimeout(() => btn.classList.remove('key-pressed'), 80);
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (document.activeElement && document.activeElement.tagName === 'INPUT' && document.activeElement.id !== 'display') return;
+
+            const modal = document.getElementById('exuModal');
+            if (modal.classList.contains('active')) {
+                if (e.key === 'Enter' || e.key === 'Escape' || e.key === ' ') dismissMentor();
+                return;
+            }
+
+            const k = e.key;
+            if (k >= '0' && k <= '9') { addDigit(k); triggerButtonVisual(`key-${k}`); }
+            else if (k === '.' || k === ',') { addDigit('.'); triggerButtonVisual('key-dot'); }
+            else if (k === '+') { setOP('+'); triggerButtonVisual('key-add'); }
+            else if (k === '-') { setOP('-'); triggerButtonVisual('key-sub'); }
+            else if (k === '*' || k.toLowerCase() === 'x') { setOP('*'); triggerButtonVisual('key-mul'); }
+            else if (k === '/') { setOP('/'); triggerButtonVisual('key-div'); }
+            else if (k === 'Enter' || k === '=') { e.preventDefault(); calculate(); triggerButtonVisual('key-eq'); }
+            else if (k === 'Backspace' || k === 'Delete') { deleteDigit(); triggerButtonVisual('key-del'); }
+            else if (k === 'Escape' || k.toLowerCase() === 'c') { clearDisplay(); triggerButtonVisual('key-c'); }
+        });
+
+        function addHistoryEntry(currCode, operation, result) {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+            historyLogs.unshift({ id: Date.now(), date: dateStr, curr: currCode, op: operation, res: result, desc: '' });
+            if (historyLogs.length > 50) historyLogs.pop();
+            saveAndRenderHistory();
+        }
+
+        function updateDescription(id, text) {
+            const item = historyLogs.find(i => i.id === id);
+            if (item) {
+                item.desc = text;
+                localStorage.setItem('calc_history_logs', JSON.stringify(historyLogs));
+            }
+        }
+
+        function clearHistory() {
+            historyLogs = [];
+            saveAndRenderHistory();
+        }
+
+        function saveAndRenderHistory() {
+            localStorage.setItem('calc_history_logs', JSON.stringify(historyLogs));
+            
+            if (historyLogs.length === 0) {
+                historyBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#555; padding: 15px;">Nenhum registro</td></tr>`;
+                return;
+            }
+
+            const frag = document.createDocumentFragment();
+            historyLogs.slice(0, 30).forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.date}</td>
+                    <td class="tag-curr">${item.curr}</td>
+                    <td class="tag-calc">${item.op}</td>
+                    <td class="tag-res">${item.res}</td>
+                    <td><input type="text" class="desc-input" placeholder="..." value="${item.desc || ''}" onchange="updateDescription(${item.id}, this.value)"></td>
+                `;
+                frag.appendChild(tr);
+            });
+            historyBody.innerHTML = '';
+            historyBody.appendChild(frag);
+        }
+
+        updateDisplay();
+        saveAndRenderHistory();
+        initVolatilityData('BRL');
+    </script>
+</body>
+</html>
