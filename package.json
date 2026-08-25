@@ -1,0 +1,26 @@
+{
+  "name": "calculadoradocaveira",
+  "version": "1.0.0",
+  "description": "Implementei muitas novidades, mas é uma calculadora pronta para usar no offline com a temática de Halloween",
+  "main": "otimização5.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thigszuza/CalculadoradoCaveira.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/thigszuza/CalculadoradoCaveira/issues"
+  },
+  "homepage": "https://github.com/thigszuza/CalculadoradoCaveira#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/cli": "^8.5.0",
+    "@capacitor/core": "^8.5.0"
+  }
+}

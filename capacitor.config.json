@@ -1,0 +1,6 @@
+{
+  "appId": "com.skull.calculadora",
+  "appName": "Calculadora Skull",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
