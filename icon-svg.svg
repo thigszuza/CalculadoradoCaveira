@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <!-- Gradiente de Fundo -->
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1f0c05" />
+      <stop offset="55%" stop-color="#0f0704" />
+      <stop offset="100%" stop-color="#050302" />
+    </radialGradient>
+
+    <!-- Brilho Escuro de Borda -->
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d35400" />
+      <stop offset="50%" stop-color="#4a1505" />
+      <stop offset="100%" stop-color="#ff3700" />
+    </linearGradient>
+
+    <!-- Gradiente do Osso -->
+    <linearGradient id="boneGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f0e6d2" />
+      <stop offset="60%" stop-color="#c4b59d" />
+      <stop offset="100%" stop-color="#7a6850" />
+    </linearGradient>
+
+    <!-- Gradiente das Sombras e Cavidades -->
+    <radialGradient id="socketGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#000000" />
+      <stop offset="75%" stop-color="#0d0806" />
+      <stop offset="100%" stop-color="#1f0c05" />
+    </radialGradient>
+
+    <!-- Brilho Vermelho Flamejante dos Olhos -->
+    <radialGradient id="eyeGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="25%" stop-color="#ff4500" />
+      <stop offset="70%" stop-color="#b31d00" />
+      <stop offset="100%" stop-color="transparent" />
+    </radialGradient>
+
+    <!-- Filtro de Sombra / Brilho Neon -->
+    <filter id="fireGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="18" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Fundo do Ícone de App com Cantos Arredondados Padrão Android (Squircle) -->
+  <rect width="1024" height="1024" rx="228" fill="url(#bgGrad)" stroke="url(#borderGrad)" stroke-width="12" />
+
+  <!-- Foice Espiritual de Fundo (Diagonal) -->
+  <g opacity="0.35">
+    <path d="M220 840 L780 180" stroke="#5a2d10" stroke-width="26" stroke-linecap="round"/>
+    <path d="M780 180 C860 140 930 220 900 320 C870 240 810 200 780 180 Z" fill="#b33600" />
+  </g>
+
+  <!-- Crânio Principal -->
+  <g filter="url(#fireGlow)">
+    <!-- Base e Caixa Craniana -->
+    <path d="M512 190 C340 190 270 320 270 470 C270 560 310 630 360 670 C360 740 400 810 430 810 C460 810 470 770 512 770 C554 770 564 810 594 810 C624 810 664 740 664 670 C714 630 754 560 754 470 C754 320 684 190 512 190 Z" 
+          fill="url(#boneGrad)" 
+          stroke="#140c08" 
+          stroke-width="14" />
+
+    <!-- Cavidades Oculares (Olhos) -->
+    <ellipse cx="405" cy="495" rx="68" ry="88" fill="url(#socketGrad)" transform="rotate(-8 405 495)" />
+    <ellipse cx="619" cy="495" rx="68" ry="88" fill="url(#socketGrad)" transform="rotate(8 619 495)" />
+
+    <!-- Chamas/Brasas nos Olhos -->
+    <circle cx="410" cy="505" r="32" fill="url(#eyeGlow)" />
+    <circle cx="614" cy="505" r="32" fill="url(#eyeGlow)" />
+    <circle cx="410" cy="505" r="8" fill="#ffffff" />
+    <circle cx="614" cy="505" r="8" fill="#ffffff" />
+
+    <!-- Cavidade Nasal (Septo) -->
+    <path d="M512 555 L482 635 C482 645 500 655 512 655 C524 655 542 645 542 635 Z" fill="#0d0806" />
+
+    <!-- Detalhe da Testa (Rachadura Mística) -->
+    <path d="M512 210 L505 270 L525 320 L515 360" fill="none" stroke="#523f2b" stroke-width="5" stroke-linecap="round" />
+
+    <!-- Dentes e Mandíbula -->
+    <g stroke="#140c08" stroke-width="10" stroke-linecap="round">
+      <line x1="440" y1="720" x2="440" y2="780" />
+      <line x1="476" y1="720" x2="476" y2="770" />
+      <line x1="512" y1="720" x2="512" y2="770" />
+      <line x1="548" y1="720" x2="548" y2="770" />
+      <line x1="584" y1="720" x2="584" y2="780" />
+    </g>
+
+    <!-- Linha de Separação dos Dentes -->
+    <path d="M420 745 Q512 760 604 745" fill="none" stroke="#140c08" stroke-width="8" />
+  </g>
+
+  <!-- Aura / Borda de Fogo Inferior -->
+  <path d="M300 890 Q512 940 724 890" fill="none" stroke="#ff4500" stroke-width="6" opacity="0.6" stroke-linecap="round" />
+</svg>
